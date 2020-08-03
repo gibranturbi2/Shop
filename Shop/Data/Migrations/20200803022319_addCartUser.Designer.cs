@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shop.Data;
 
 namespace Shop.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200803022319_addCartUser")]
+    partial class addCartUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,8 +253,6 @@ namespace Shop.Data.Migrations
 
                     b.Property<string>("Ciudad");
 
-                    b.Property<int?>("ClienteId");
-
                     b.Property<string>("CodigoPostal");
 
                     b.Property<string>("Direccion");
@@ -260,8 +260,6 @@ namespace Shop.Data.Migrations
                     b.Property<string>("OrdenRef");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClienteId");
 
                     b.ToTable("Ordens");
                 });
@@ -386,13 +384,6 @@ namespace Shop.Data.Migrations
                         .WithMany()
                         .HasForeignKey("ProductoId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Shop.Models.Orden", b =>
-                {
-                    b.HasOne("Shop.Models.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId");
                 });
 
             modelBuilder.Entity("Shop.Models.OrdenProducto", b =>

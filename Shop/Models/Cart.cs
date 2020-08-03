@@ -10,7 +10,16 @@ namespace Shop.Models
     {
         [Key]
         public int Id { get; set; }
-        public int StockId { get; set; }
-        public int Cantidad { get; set; }
+        public int ClientId { get; set; }
+        public Cliente Cliente { get; set; }
+
+        public List<CartItem> Items { get;  set; }
     }
+
+
+    public class CartViewModel : Cart
+    {
+        public int[] CartItems { get;set; }
+    }
+
 }

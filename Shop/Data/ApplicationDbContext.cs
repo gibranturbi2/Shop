@@ -18,5 +18,6 @@ namespace Shop.Data
         public DbSet<Orden> Ordens { get; set; }
         public DbSet<Cliente> Clientes { get; set; }
         public DbSet<OrdenProducto> OrdenProductos { get; set; }
+        public DbSet<Cart> Cart { get; set; }
     }
 }

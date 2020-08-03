@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shop.Data;
 
 namespace Shop.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200803020940_addCart")]
+    partial class addCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -190,36 +192,13 @@ namespace Shop.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ClientId");
-
-                    b.Property<int?>("ClienteId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClienteId");
-
-                    b.ToTable("Cart");
-                });
-
-            modelBuilder.Entity("Shop.Models.CartItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
                     b.Property<int>("Cantidad");
 
-                    b.Property<int>("CartId");
-
-                    b.Property<int>("ProductoId");
+                    b.Property<int>("StockId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CartId");
-
-                    b.HasIndex("ProductoId");
-
-                    b.ToTable("CartItem");
+                    b.ToTable("Cart");
                 });
 
             modelBuilder.Entity("Shop.Models.Cliente", b =>
@@ -251,8 +230,6 @@ namespace Shop.Data.Migrations
 
                     b.Property<string>("Ciudad");
 
-                    b.Property<int?>("ClienteId");
-
                     b.Property<string>("CodigoPostal");
 
                     b.Property<string>("Direccion");
@@ -260,8 +237,6 @@ namespace Shop.Data.Migrations
                     b.Property<string>("OrdenRef");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ClienteId");
 
                     b.ToTable("Ordens");
                 });
@@ -366,33 +341,6 @@ namespace Shop.Data.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Shop.Models.Cart", b =>
-                {
-                    b.HasOne("Shop.Models.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId");
-                });
-
-            modelBuilder.Entity("Shop.Models.CartItem", b =>
-                {
-                    b.HasOne("Shop.Models.Cart", "Cart")
-                        .WithMany("Items")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Shop.Models.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Shop.Models.Orden", b =>
-                {
-                    b.HasOne("Shop.Models.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId");
                 });
 
             modelBuilder.Entity("Shop.Models.OrdenProducto", b =>

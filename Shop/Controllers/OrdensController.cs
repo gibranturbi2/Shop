@@ -22,7 +22,7 @@ namespace Shop.Controllers
         // GET: Ordens
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Ordens.ToListAsync());
+            return View(await _context.Ordens.Include(t => t.Cliente).ToListAsync());
         }
 
         // GET: Ordens/Details/5
@@ -46,6 +46,8 @@ namespace Shop.Controllers
         // GET: Ordens/Create
         public IActionResult Create()
         {
+            ViewData["ProductoId"] = new SelectList(_context.Productos, "Id", "Nombre");
+            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nombre");
             return View();
         }
 
@@ -54,14 +56,28 @@ namespace Shop.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,OrdenRef,Direccion1,Ciudad,CodigoPostal")] Orden orden)
+        public async Task<IActionResult> Create([Bind("Id,OrdenRef,Direccion,Ciudad,CodigoPostal,Products,ClienteId")] OrdenViewModel orden)
         {
             if (ModelState.IsValid)
             {
+                orden.Cliente = _context.Clientes.FirstOrDefault(c => c.Id == orden.ClienteId);
                 _context.Add(orden);
+                foreach (var productId in orden.Products)
+                {
+                    OrdenProducto ordenProducto = new OrdenProducto
+                    {
+                        ProductoId = productId,
+                        OrdenId = orden.Id
+                    };
+
+                    _context.Add(ordenProducto);
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewData["Products"] = _context.OrdenProductos.ToList();
+
             return View(orden);
         }
 
