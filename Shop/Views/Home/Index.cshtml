@@ -1,4 +1,6 @@
-﻿@{
+﻿@model IEnumerable<Shop.Models.Producto>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -52,6 +54,29 @@
         <span class="sr-only">Next</span>
     </a>
 </div>
+
+<div style="display:flex;">
+    @foreach (var product in Model)
+    {
+        <div class="card">
+            
+            <img class="card-picture" src="@product.Foto" />
+            <div class="card-title">
+                @product.Nombre
+            </div>
+            <div class="card-subtitle">
+                <span>@product.Precio</span>
+            </div>
+            <div class="card-actions">
+                <button type="button">Agregar al carrito</button>
+            </div>
+        </div>
+    }
+
+</div>
+
+
+
 
 <div class="row">
     <div class="col-md-3">

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ namespace Shop.Controllers
         }
 
         // GET: Stocks
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Stock.Include(s => s.Producto);

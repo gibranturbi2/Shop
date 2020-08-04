@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +17,12 @@ namespace Shop.Controllers
         private readonly ApplicationDbContext _context;
 
         public CartsController(ApplicationDbContext context)
-        {
+{
             _context = context;
         }
 
         // GET: Carts
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Cart.Include(t => t.Cliente).Include(t => t.Items).ToListAsync());
