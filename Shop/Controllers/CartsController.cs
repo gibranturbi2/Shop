@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,17 +17,19 @@ namespace Shop.Controllers
     public class CartsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly Claim claim;
 
-        public CartsController(ApplicationDbContext context)
-{
+        public CartsController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
+        {
+            claim = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
             _context = context;
         }
 
         // GET: Carts
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Cart.Include(t => t.Cliente).Include(t => t.Items).ToListAsync());
+            var carts = await _context.Cart.Include(t => t.Cliente).Include(t => t.Items).Where(t => t.Cliente.Id == (claim != null ? claim.Value : null)).ToListAsync();
+            return View(carts);
         }
 
         // GET: Carts/Details/5
@@ -49,7 +53,7 @@ namespace Shop.Controllers
         // GET: Carts/Create
         public IActionResult Create()
         {
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nombre");
+            ViewData["ClienteId"] = new SelectList(_context.Users, "Id", "Nombre");
             ViewData["ProductoId"] = new SelectList(_context.Productos, "Id", "Nombre");
             return View();
         }
@@ -58,12 +62,11 @@ namespace Shop.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ClientId,CartItems")] CartViewModel cart)
         {
             if (ModelState.IsValid)
             {
-                cart.Cliente = _context.Clientes.FirstOrDefault(t => t.Id == cart.ClientId);
+                cart.Cliente = _context.Users.FirstOrDefault(t => t.Id == cart.ClientId);
 
                 _context.Add(cart);
                 foreach (var productId in cart.CartItems)

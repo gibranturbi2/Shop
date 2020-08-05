@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,14 +16,14 @@ namespace Shop.Controllers
     public class ProductosController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public ProductosController(ApplicationDbContext context)
+        private readonly IHostingEnvironment _hostingEnvironment;
+        public ProductosController(ApplicationDbContext context, IHostingEnvironment hostingEnvironment)
         {
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // GET: Productoes
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Productos.ToListAsync());
@@ -56,10 +58,21 @@ namespace Shop.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Descripcion,Precio,Foto")] Producto producto)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Descripcion,Precio,FotoInput")] ProductoViewModel producto)
         {
             if (ModelState.IsValid)
             {
+                string wwwrootPath = _hostingEnvironment.WebRootPath;
+                string filename = Path.GetFileNameWithoutExtension(producto.FotoInput.FileName);
+                string extension = Path.GetExtension(producto.FotoInput.FileName);
+                producto.Foto = filename = filename + DateTime.Now.ToString("yymmssfff") + extension;
+                string path = Path.Combine(wwwrootPath + "/images/", filename);
+                using(var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await producto.FotoInput.CopyToAsync(fileStream);
+                }
+
+
                 _context.Add(producto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -76,11 +89,21 @@ namespace Shop.Controllers
             }
 
             var producto = await _context.Productos.FindAsync(id);
+            var returnProduct = new ProductoViewModel
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Precio = producto.Precio,
+                Foto = producto.Foto
+
+            };
+
             if (producto == null)
             {
                 return NotFound();
             }
-            return View(producto);
+            return View(returnProduct);
         }
 
         // POST: Productoes/Edit/5
@@ -88,7 +111,7 @@ namespace Shop.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,Precio,Foto")] Producto producto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,Precio,Foto, FotoInput")] ProductoViewModel producto)
         {
             if (id != producto.Id)
             {
@@ -99,6 +122,15 @@ namespace Shop.Controllers
             {
                 try
                 {
+                    string wwwrootPath = _hostingEnvironment.WebRootPath;
+                    string filename = Path.GetFileNameWithoutExtension(producto.FotoInput.FileName);
+                    string extension = Path.GetExtension(producto.FotoInput.FileName);
+                    producto.Foto = filename = filename + DateTime.Now.ToString("yymmssfff") + extension;
+                    string path = Path.Combine(wwwrootPath + "/images/", filename);
+                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    {
+                        await producto.FotoInput.CopyToAsync(fileStream);
+                    }
                     _context.Update(producto);
                     await _context.SaveChangesAsync();
                 }

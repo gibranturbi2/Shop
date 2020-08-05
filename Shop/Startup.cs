@@ -12,11 +12,39 @@ using Microsoft.EntityFrameworkCore;
 using Shop.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace Shop
 {
+    public class IdentityUserDb : IdentityUser
+    {
+        public IdentityUserDb() : base()
+        {
+
+        }
+
+        [Column("Name")]
+        public string Name { get; set; }
+
+        [Column("LastName")]
+        public string LastName { get; set; }
+
+        [Column("Telephone")]
+        public string Telephone { get; set; }
+
+        [Column("Address")]
+        public string Address { get; set; }
+    }
+
+    public class EmailSettings
+    {
+
+    }
+
     public class Startup
     {
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -37,10 +65,13 @@ namespace Shop
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddIdentity<IdentityUserDb, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddHttpContextAccessor();
+            
+
+            services.AddMvc().AddRazorPagesOptions(o => o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute())).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

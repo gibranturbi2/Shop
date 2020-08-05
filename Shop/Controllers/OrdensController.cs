@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,19 +13,22 @@ using Shop.Models;
 
 namespace Shop.Controllers
 {
+    [Authorize]
     public class OrdensController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private Claim claim;
 
-        public OrdensController(ApplicationDbContext context)
+        public OrdensController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
+            claim = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
             _context = context;
         }
 
         // GET: Ordens
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
+            
             return View(await _context.Ordens.Include(t => t.Cliente).ToListAsync());
         }
 
@@ -62,7 +67,7 @@ namespace Shop.Controllers
         {
             if (ModelState.IsValid)
             {
-                orden.Cliente = _context.Clientes.FirstOrDefault(c => c.Id == orden.ClienteId);
+                orden.Cliente = _context.Users.FirstOrDefault(c => c.Id == orden.ClienteId);
                 _context.Add(orden);
                 foreach (var productId in orden.Products)
                 {
@@ -81,6 +86,34 @@ namespace Shop.Controllers
             ViewData["Products"] = _context.OrdenProductos.ToList();
 
             return View(orden);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateOrder(int cartId)
+        {
+            var cliente = _context.Users.FirstOrDefault(c => c.Id == claim.Value);
+            var cart = _context.Cart.Include(t => t.Items).FirstOrDefault(c => c.Id == cartId);
+            var order = new Orden();
+            order.Cliente = cliente;
+            order.Direccion = cliente.Address;
+
+            _context.Add(order);
+            
+            foreach(var item in cart.Items)
+            {
+                var producto = _context.Productos.FirstOrDefault(i => i.Id == item.ProductoId);
+                var orderItem = new OrdenProducto
+                {
+                    Producto = producto,
+                    Orden = order
+                };
+
+                _context.Add(orderItem);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return View(order);
         }
 
         // GET: Ordens/Edit/5

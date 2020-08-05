@@ -10,8 +10,8 @@ namespace Shop.Models
     {
         [Key]
         public int Id { get; set; }
-        public int ClientId { get; set; }
-        public Cliente Cliente { get; set; }
+        public string ClientId { get; set; }
+        public IdentityUserDb Cliente { get; set; }
 
         public List<CartItem> Items { get;  set; }
     }

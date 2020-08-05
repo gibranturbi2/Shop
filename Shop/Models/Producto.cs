@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,5 +18,10 @@ namespace Shop.Models
 
         public ICollection<Stock> Stock { get; set; }
         public ICollection<OrdenProducto> OrdenProductos { get; set; }
+    }
+
+    public class ProductoViewModel : Producto
+    {
+        public IFormFile FotoInput { get; set; }
     }
 }

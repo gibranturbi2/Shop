@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shop.Data;
 using Shop.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shop.Controllers
 {
@@ -21,21 +22,20 @@ namespace Shop.Controllers
         }
 
         // GET: Clientes
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clientes.ToListAsync());
+            return View(await _context.Users.ToListAsync());
         }
 
         // GET: Clientes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
+            var cliente = await _context.Users
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (cliente == null)
             {
@@ -56,7 +56,7 @@ namespace Shop.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Telefono,Direccion,Email")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("Id,Name,LastName,Telephone,Address,Email")] IdentityUserDb cliente)
         {
             if (ModelState.IsValid)
             {
@@ -68,14 +68,14 @@ namespace Shop.Controllers
         }
 
         // GET: Clientes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = await _context.Users.FindAsync(id);
             if (cliente == null)
             {
                 return NotFound();
@@ -88,7 +88,7 @@ namespace Shop.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Telefono,Direccion,Email")] Cliente cliente)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,LastName,Telephone,Address,Email")] IdentityUserDb cliente)
         {
             if (id != cliente.Id)
             {
@@ -99,7 +99,14 @@ namespace Shop.Controllers
             {
                 try
                 {
-                    _context.Update(cliente);
+                    var user = _context.Users.FirstOrDefault(i => i.Id == id);
+
+                    user.Name = cliente.Name;
+                    user.LastName = cliente.LastName;
+                    user.Telephone = cliente.Telephone;
+                    user.Address = cliente.Address;
+                    user.Email = cliente.Email;
+                    _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -119,14 +126,14 @@ namespace Shop.Controllers
         }
 
         // GET: Clientes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var cliente = await _context.Clientes
+            var cliente = await _context.Users
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (cliente == null)
             {
@@ -139,17 +146,17 @@ namespace Shop.Controllers
         // POST: Clientes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
-            _context.Clientes.Remove(cliente);
+            var cliente = await _context.Users.FindAsync(id);
+            _context.Users.Remove(cliente);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClienteExists(int id)
+        private bool ClienteExists(string id)
         {
-            return _context.Clientes.Any(e => e.Id == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }

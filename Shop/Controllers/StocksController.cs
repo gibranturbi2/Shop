@@ -9,6 +9,7 @@ using Shop.Models;
 
 namespace Shop.Controllers
 {
+    [Authorize]
     public class StocksController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,7 +20,6 @@ namespace Shop.Controllers
         }
 
         // GET: Stocks
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Stock.Include(s => s.Producto);

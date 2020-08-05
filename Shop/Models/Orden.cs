@@ -11,7 +11,7 @@ namespace Shop.Models
         [Key]
         public int Id { get; set; }
      
-        public Cliente Cliente { get; set; }
+        public IdentityUserDb Cliente { get; set; }
         public string OrdenRef { get; set; }
         public string Direccion { get; set; }
         public string Ciudad { get; set; }
@@ -23,7 +23,7 @@ namespace Shop.Models
 
     public class OrdenViewModel : Orden
     {
-        public int ClienteId { get; set; }
+        public string ClienteId { get; set; }
         public int[] Products { get; set; }
     }
 }

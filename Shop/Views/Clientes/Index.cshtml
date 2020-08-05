@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Shop.Models.Cliente>
+﻿@model IEnumerable<Shop.IdentityUserDb>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,16 +13,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Nombre)
+               Nombre
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Apellido)
+               Apellido
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Telefono)
+               Telefono
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Direccion)
+                Direccion
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Email)
@@ -34,16 +34,16 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
+                @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Apellido)
+                @Html.DisplayFor(modelItem => item.LastName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Telefono)
+                @Html.DisplayFor(modelItem => item.Telephone)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Direccion)
+                @Html.DisplayFor(modelItem => item.Address)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Email)

@@ -16,6 +16,7 @@
                 @Html.DisplayNameFor(model => model.Cliente)
             </th>
             <th>No. Items</th>
+            <th>Monto total</th>
         </tr>
     </thead>
     <tbody>
@@ -23,13 +24,13 @@
 {
         <tr>
             <td>
-                @item.Cliente.Nombre @item.Cliente.Apellido
+                @item.Cliente.Name @item.Cliente.LastName
             </td>
             <td>
                 @item.Items.Count()
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-controller="Ordens" asp-action="CreateOrder" asp-route-cartId="@item.Id">Pagar</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
             </td>
